@@ -127,3 +127,26 @@ class predicate:
         def result(*args, **kwargs):
             return not self.func(*args, **kwargs) 
         return predicate(result)   
+    
+
+def recviz(func):
+    """The decorator fully visualizes the execution of the decorated function, including the recursive one. 
+    The decorator displays all recursive calls and the return values ​​encountered by those calls, 
+    with depth-to-recursive calls separated by four spaces."""
+    deep = 0
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        nonlocal deep
+        if not kwargs:
+            temp = ", ".join([str(i) for i in args])
+            print(f"{'    '*deep}-> {func.__name__}({temp})")
+        else:
+            temp1 = ", ".join([repr(i) for i in args])
+            temp2 = ', '.join(f"{k}={repr(v)}"  for k, v in kwargs.items() )
+            print(f"{'    '*deep}-> {func.__name__}({temp1 + ', '+ temp2})")
+        deep += 1
+        result = func(*args, **kwargs)
+        print(f"{'    '*(deep-1)}<- {result.__repr__()}")
+        deep -= 1
+        return result
+    return inner
